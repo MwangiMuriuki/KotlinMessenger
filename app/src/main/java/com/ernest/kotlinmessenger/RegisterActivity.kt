@@ -67,34 +67,7 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         registerButton.setOnClickListener {
-            val username = regusernameField.text.toString()
-            val email = regEmailField.text.toString()
-            val password = regPasswordField.text.toString()
-
-            if (username.isEmpty()){
-                Toast.makeText(
-                    baseContext, "Please Enter Username.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            else if (email.isEmpty()){
-
-                Toast.makeText(
-                    baseContext, "Please Enter Email.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-
-            else if (password.isEmpty()){
-
-                Toast.makeText(
-                    baseContext, "Please enter password.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            else{
-                registerNewUser(username,email, password)
-            }
+            validateFields()
 
         }
 
@@ -103,6 +76,7 @@ class RegisterActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+
 
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>, grantResults: IntArray) {
@@ -136,11 +110,52 @@ class RegisterActivity : AppCompatActivity() {
         if (requestCode == 100 && resultCode == Activity.RESULT_OK && data != null){
 
             userDisplayPic = data.data
+
             Glide.with(this)
                 .load(userDisplayPic)
                 .into(profilePic)
         }
     }
+
+    private fun validateFields() {
+
+        val userPic = userDisplayPic.toString()
+        val username = regusernameField.text.toString()
+        val email = regEmailField.text.toString()
+        val password = regPasswordField.text.toString()
+
+        if (userDisplayPic == null){
+            Toast.makeText(
+                baseContext, "Please Select a Profile Picture.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+        else if (username.isEmpty()){
+            Toast.makeText(
+                baseContext, "Please Enter Username.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+        else if (email.isEmpty()){
+
+            Toast.makeText(
+                baseContext, "Please Enter Email.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        else if (password.isEmpty()){
+
+            Toast.makeText(
+                baseContext, "Please enter password.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+        else{
+            registerNewUser(username,email, password)
+        }
+    }
+
 
     private fun registerNewUser(username: String, email: String, password: String) {
 

@@ -25,7 +25,15 @@ class LoginActivity : AppCompatActivity() {
             val loginEmail = loginEmailField.text.toString()
             val loginPassword = loginPasswordField.text.toString()
 
-            mthdLogin(loginEmail, loginPassword)
+            if (loginEmail.isEmpty()){
+                Toast.makeText(baseContext, "Please Enter An Email Address", Toast.LENGTH_LONG).show()
+            }
+            else if (loginPassword.isEmpty()){
+                Toast.makeText(baseContext, "Please Enter Your Password", Toast.LENGTH_LONG).show()
+
+            }else{
+                mthdLogin(loginEmail, loginPassword)
+            }
         }
     }
 
