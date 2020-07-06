@@ -8,7 +8,6 @@ import com.google.firebase.auth.FirebaseAuth
 class ActivityCheckLogin : AppCompatActivity() {
     val mAuth = FirebaseAuth.getInstance()
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -18,7 +17,7 @@ class ActivityCheckLogin : AppCompatActivity() {
             val Login = Intent(applicationContext, ChatList::class.java)
             startActivity(Login)
         } else {
-            val MainPage = Intent(applicationContext, RegisterActivity::class.java)
+            val MainPage = Intent(applicationContext, ActivityRegister::class.java)
             startActivity(MainPage)
         }
 

@@ -21,7 +21,8 @@ class ChatList : AppCompatActivity() {
         setContentView(R.layout.activity_chat_list)
         setSupportActionBar(chatListToolbar)
         supportActionBar?.apply {
-            title = "Messenger"
+            title = "Messages"
+
 //            setDisplayUseLogoEnabled(false)
 //            setIcon(R.drawable.avatar)
         }

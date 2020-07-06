@@ -20,12 +20,16 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
+import com.instabug.library.Instabug
+import com.instabug.library.invocation.InstabugInvocationEvent
+import com.theartofdev.edmodo.cropper.CropImage
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.util.*
+import kotlin.collections.HashMap
 
 
-class RegisterActivity : AppCompatActivity() {
+abstract class RegisterActivity : AppCompatActivity() {
     var mAuth: FirebaseAuth? = null
     val firestoreDB = Firebase.firestore
     var storage = Firebase.storage
@@ -33,6 +37,7 @@ class RegisterActivity : AppCompatActivity() {
     val TAG: String = "My Activity";
     var userDisplayPic: Uri? = null
     var display_picture: String? = null
+    var fetchedDownloadUrl: String? = null
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,9 +65,13 @@ class RegisterActivity : AppCompatActivity() {
 
         profilePic.setOnClickListener {
 
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.type = "image/*"
-            startActivityForResult(intent, 100)
+//            val intent = Intent(Intent.ACTION_PICK)
+//            intent.type = "image/*"
+//            startActivityForResult(intent, 100)
+
+            CropImage.activity()
+                .setAspectRatio(1, 1)
+                .start(this@RegisterActivity)
 
         }
 
@@ -107,13 +116,27 @@ class RegisterActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == 100 && resultCode == Activity.RESULT_OK && data != null){
+//        if (requestCode == 100 && resultCode == Activity.RESULT_OK && data != null){
+//
+//            userDisplayPic = data.data
+//
+//            Glide.with(this)
+//                .load(userDisplayPic)
+//                .into(profilePic)
+//        }
 
-            userDisplayPic = data.data
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
+            val result = CropImage.getActivityResult(data)
+            if (resultCode == Activity.RESULT_OK){
 
-            Glide.with(this)
-                .load(userDisplayPic)
-                .into(profilePic)
+                var resultUri: Uri? = result.uri
+                userDisplayPic = resultUri
+
+                Glide.with(this)
+                    .load(userDisplayPic)
+                    .into(profilePic)
+            }
+
         }
     }
 
@@ -124,7 +147,7 @@ class RegisterActivity : AppCompatActivity() {
         val email = regEmailField.text.toString()
         val password = regPasswordField.text.toString()
 
-        if (userDisplayPic == null){
+        if (userPic.isEmpty()){
             Toast.makeText(
                 baseContext, "Please Select a Profile Picture.",
                 Toast.LENGTH_SHORT
@@ -156,7 +179,6 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-
     private fun registerNewUser(username: String, email: String, password: String) {
 
         mAuth!!.createUserWithEmailAndPassword(email, password)
@@ -164,8 +186,6 @@ class RegisterActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     val user = mAuth!!.currentUser
                     val userID = mAuth!!.currentUser!!.uid
-
-//                    userDisplayPic?.let { uploadImage(it, username, email, userID, user) }
 
                     uploadImageToFirebase(userDisplayPic, username, email, userID, user)
 
@@ -189,16 +209,26 @@ class RegisterActivity : AppCompatActivity() {
     ) {
 
         val fileName = UUID.randomUUID().toString()
-        val storageReference = FirebaseStorage.getInstance().getReference("images/$username")
+        val storageReference = FirebaseStorage.getInstance().getReference("Profile Images/$username")
         storageReference.putFile(userDisplayPic!!).addOnSuccessListener {
             Log.d("Test_register", "Successfully uploaded Image: ${it.metadata?.path}")
-            var fetchedDownloadUrl = storageReference.downloadUrl.toString()
+//            var fetchedDownloadUrl = storageReference.downloadUrl.toString()
 
-            val newUser = hashMapOf(
-                "username" to username,
-                "email" to email,
-                "dp" to fetchedDownloadUrl
-            )
+            val newUser: HashMap<String, Any> = HashMap()
+            storageReference.downloadUrl.addOnSuccessListener { uri ->
+                fetchedDownloadUrl = uri.toString()
+
+                newUser.put( "username", username)
+                newUser.put( "email", email)
+                newUser.put( "dp", fetchedDownloadUrl.toString())
+
+            }
+
+//            val newUser = hashMapOf(
+//                "username" to username,
+//                "email" to email,
+//                "dp" to fetchedDownloadUrl
+//            )
 
             firestoreDB.collection("Users")
                 .document(userID)
@@ -277,33 +307,6 @@ class RegisterActivity : AppCompatActivity() {
 
         }
 
-//        uploadTask.addOnCompleteListener {
-//            if (it.isSuccessful){
-//                val downloadURL = it.result
-//
-//                val newUser = hashMapOf(
-//                    "username" to username,
-//                    "email" to email,
-//                    "dp" to downloadURL
-//                )
-//
-//                firestoreDB.collection("Users")
-//                    .document(userID)
-//                    .set(newUser)
-//                    .addOnSuccessListener {
-//
-//                    }.addOnFailureListener {
-//                        Log.w(TAG, "Error adding document", it)
-//
-//                        Toast.makeText(
-//                            baseContext,
-//                            "Authentication Has failed.",
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-//                    }
-//                updateUI(user)
-//            }
-//        }
     }
 
     private fun updateUI(user: FirebaseUser?) {
