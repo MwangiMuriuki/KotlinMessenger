@@ -2,6 +2,7 @@ package com.ernest.kotlinmessenger.ModelClasses
 
 data class ModelClassUserDetails (
     val username: String = "",
-    val profilePic: String = "",
-    val userEmail: String = ""
+    val dp: String = "",
+    val email: String = "",
+    val userID: String = ""
 )

@@ -17,8 +17,9 @@
         android:roundIcon="@drawable/app_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-
-        <activity android:name=".ActivityRegister"
+        <activity android:name=".Activities.ActivityMessages"></activity>
+        <activity
+            android:name=".Activities.ActivityRegister"
             android:configChanges="orientation|keyboardHidden|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:resizeableActivity="true"
             android:screenOrientation="portrait"
@@ -28,7 +29,7 @@
             tools:ignore="LockedOrientationActivity"
             tools:targetApi="n" />
         <activity
-            android:name=".SelectUserActivity"
+            android:name=".Activities.SelectUserActivity"
             android:configChanges="orientation|keyboardHidden|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:resizeableActivity="true"
             android:screenOrientation="portrait"
@@ -40,7 +41,7 @@
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
-        <activity android:name=".ActivityCheckLogin">
+        <activity android:name=".Activities.ActivityCheckLogin">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -48,7 +49,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ChatList"
+            android:name=".Activities.ActivityConversations"
             android:configChanges="orientation|keyboardHidden|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:resizeableActivity="true"
             android:screenOrientation="portrait"
@@ -58,7 +59,7 @@
             tools:ignore="LockedOrientationActivity"
             tools:targetApi="n" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".Activities.LoginActivity"
             android:configChanges="orientation|keyboardHidden|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:resizeableActivity="true"
             android:screenOrientation="portrait"

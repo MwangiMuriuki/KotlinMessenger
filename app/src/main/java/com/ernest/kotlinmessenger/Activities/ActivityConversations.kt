@@ -1,24 +1,25 @@
-package com.ernest.kotlinmessenger
+package com.ernest.kotlinmessenger.Activities
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import com.ernest.kotlinmessenger.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.android.synthetic.main.activity_chat_list.*
+import kotlinx.android.synthetic.main.activity_conversations.*
 
 
-class ChatList : AppCompatActivity() {
+class ActivityConversations : AppCompatActivity() {
     var firebaseAuth: FirebaseAuth? = null
     val firebaseFirestore = Firebase.firestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_chat_list)
+        setContentView(R.layout.activity_conversations)
         setSupportActionBar(chatListToolbar)
         supportActionBar?.apply {
             title = "Messages"
@@ -50,7 +51,7 @@ class ChatList : AppCompatActivity() {
             R.id.logout -> {
                 FirebaseAuth.getInstance().signOut()
 
-                val Register = Intent(applicationContext, RegisterActivity::class.java)
+                val Register = Intent(applicationContext, ActivityRegister::class.java)
                 startActivity(Register)
                 finish()
             }

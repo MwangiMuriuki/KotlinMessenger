@@ -1,4 +1,4 @@
-package com.ernest.kotlinmessenger
+package com.ernest.kotlinmessenger.Activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -14,7 +14,7 @@ class ActivityCheckLogin : AppCompatActivity() {
         val userLoggedIn = mAuth.currentUser
 
         if (userLoggedIn != null) {
-            val Login = Intent(applicationContext, ChatList::class.java)
+            val Login = Intent(applicationContext, ActivityConversations::class.java)
             startActivity(Login)
         } else {
             val MainPage = Intent(applicationContext, ActivityRegister::class.java)

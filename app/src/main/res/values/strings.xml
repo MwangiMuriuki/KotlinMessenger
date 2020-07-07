@@ -2,4 +2,5 @@
     <string name="app_name">KotlinMessenger</string>
     <string name="new_message">New Message</string>
     <string name="logout">Logout</string>
+    <string name="enter_message">Enter message</string>
 </resources>

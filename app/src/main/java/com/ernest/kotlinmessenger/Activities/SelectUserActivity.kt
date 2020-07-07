@@ -1,12 +1,11 @@
-package com.ernest.kotlinmessenger
+package com.ernest.kotlinmessenger.Activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import com.ernest.kotlinmessenger.Adapters.UsersAdapter
 import com.ernest.kotlinmessenger.ModelClasses.ModelClassUserDetails
+import com.ernest.kotlinmessenger.R
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.toObject
 
 import kotlinx.android.synthetic.main.activity_select_user.*
 

@@ -1,4 +1,4 @@
-package com.ernest.kotlinmessenger
+package com.ernest.kotlinmessenger.Activities
 
 import android.Manifest
 import android.app.Activity
@@ -6,30 +6,27 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
+import com.ernest.kotlinmessenger.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
-import com.instabug.library.Instabug
-import com.instabug.library.invocation.InstabugInvocationEvent
 import com.theartofdev.edmodo.cropper.CropImage
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.File
 import java.util.*
-import kotlin.collections.HashMap
 
+class ActivityRegister : AppCompatActivity() {
 
-abstract class RegisterActivity : AppCompatActivity() {
     var mAuth: FirebaseAuth? = null
     val firestoreDB = Firebase.firestore
     var storage = Firebase.storage
@@ -42,7 +39,7 @@ abstract class RegisterActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_register)
 
         mAuth = FirebaseAuth.getInstance()
 
@@ -71,7 +68,7 @@ abstract class RegisterActivity : AppCompatActivity() {
 
             CropImage.activity()
                 .setAspectRatio(1, 1)
-                .start(this@RegisterActivity)
+                .start(this@ActivityRegister)
 
         }
 
@@ -85,7 +82,6 @@ abstract class RegisterActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
-
 
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>, grantResults: IntArray) {
@@ -214,76 +210,15 @@ abstract class RegisterActivity : AppCompatActivity() {
             Log.d("Test_register", "Successfully uploaded Image: ${it.metadata?.path}")
 //            var fetchedDownloadUrl = storageReference.downloadUrl.toString()
 
-            val newUser: HashMap<String, Any> = HashMap()
             storageReference.downloadUrl.addOnSuccessListener { uri ->
                 fetchedDownloadUrl = uri.toString()
-
-                newUser.put( "username", username)
-                newUser.put( "email", email)
-                newUser.put( "dp", fetchedDownloadUrl.toString())
-
-            }
-
-//            val newUser = hashMapOf(
-//                "username" to username,
-//                "email" to email,
-//                "dp" to fetchedDownloadUrl
-//            )
-
-            firestoreDB.collection("Users")
-                .document(userID)
-                .set(newUser)
-                .addOnSuccessListener {
-
-                }.addOnFailureListener {
-                    Log.w("FirestoreError", "Error adding document", it)
-
-                    Toast.makeText(
-                        baseContext,
-                        "Error adding User Data.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            updateUI(user)
-        }.addOnFailureListener {
-            Log.e("Test_register", "Failure uploading image test")
-        }
-    }
-
-    private fun uploadImage(
-        userDisplayPic: Uri?,
-        username: String,
-        email: String,
-        userID: String,
-        user: FirebaseUser?
-    ) {
-
-        val profPicRef = storageRef.child("display_photos")
-        val imagePath = userDisplayPic.toString()
-        val file = Uri.fromFile(File(imagePath))
-
-        var uploadTask = profPicRef.putFile(file)
-
-        val taskUrl = uploadTask.continueWithTask {
-            if (!it.isSuccessful) {
-                it.exception?.let {
-                    throw it
-                }
-            }
-            profPicRef.downloadUrl
-
-        }.addOnCompleteListener {
-            if (it.isSuccessful) {
-                val downloadUri = it.result
-
-                display_picture = downloadUri.toString()
 
                 val newUser = hashMapOf(
                     "username" to username,
                     "email" to email,
-                    "dp" to display_picture
+                    "userID" to userID,
+                    "dp" to fetchedDownloadUrl.toString()
                 )
-
                 firestoreDB.collection("Users")
                     .document(userID)
                     .set(newUser)
@@ -298,28 +233,19 @@ abstract class RegisterActivity : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-                updateUI(user)
-            } else {
-                Log.w("TaskError", "Error adding document", it.exception)
 
-                Toast.makeText(baseContext, "Failure uploading data.", Toast.LENGTH_SHORT).show()
             }
+            updateUI(user)
 
+        }.addOnFailureListener {
+            Log.e("Test_register", "Failure uploading image test")
         }
-
     }
 
     private fun updateUI(user: FirebaseUser?) {
 
-        val intent = Intent(this, ChatList::class.java)
+        val intent = Intent(this, ActivityConversations::class.java)
         startActivity(intent)
-    }
-
-    public override fun onStart() {
-        super.onStart()
-        // Check if user is signed in (non-null) and update UI accordingly.
-        val currentUser = mAuth!!.currentUser
-//        updateUI(currentUser)
     }
 
 }

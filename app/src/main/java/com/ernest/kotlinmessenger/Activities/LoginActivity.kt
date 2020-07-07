@@ -1,10 +1,10 @@
-package com.ernest.kotlinmessenger
+package com.ernest.kotlinmessenger.Activities
 
-import android.R.attr.password
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.ernest.kotlinmessenger.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.ktx.firestore
@@ -56,7 +56,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun updateUI(user: FirebaseUser?) {
-        val intent = Intent(this, ChatList::class.java)
+        val intent = Intent(this, ActivityConversations::class.java)
         startActivity(intent)
     }
 }

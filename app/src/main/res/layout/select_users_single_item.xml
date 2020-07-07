@@ -19,15 +19,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-<!--        <de.hdodenhof.circleimageview.CircleImageView-->
-<!--            android:id="@+id/userPic"-->
-<!--            android:layout_width="60dp"-->
-<!--            android:layout_height="60dp"-->
-<!--            android:src="@drawable/app_icon"/>-->
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/userPic"
             android:layout_width="60dp"
-            android:layout_height="60dp"/>
+            android:layout_height="60dp"
+            android:src="@drawable/app_icon"/>
+<!--        <ImageView-->
+<!--            android:id="@+id/userPic"-->
+<!--            android:layout_width="60dp"-->
+<!--            android:layout_height="60dp"/>-->
 
         <TextView
             android:id="@+id/userNameTV"
