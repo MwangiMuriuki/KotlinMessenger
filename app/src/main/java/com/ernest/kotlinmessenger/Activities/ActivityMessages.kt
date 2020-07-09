@@ -135,6 +135,7 @@ class ActivityMessages : AppCompatActivity() {
         messagesMap["seen"] = false
         messagesMap["type"] = "text"
         messagesMap["timestamp"] = ServerValue.TIMESTAMP
+        messagesMap["sender"] = currentUserID
 
         val messagesChatMap:HashMap<String,Any> = HashMap<String,Any>()
         messagesChatMap["$currentUserRef/$keyPushId"] = messagesMap

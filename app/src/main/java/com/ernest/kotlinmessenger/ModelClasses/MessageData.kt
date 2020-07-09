@@ -5,7 +5,8 @@ data class MessageData (
     val seen: Boolean = false,
     val time: Long = 0,
     val type: String = "",
-    val userDisplayPic: String = ""
+    val userDisplayPic: String = "",
+    val sender: String = ""
 )
 
 
