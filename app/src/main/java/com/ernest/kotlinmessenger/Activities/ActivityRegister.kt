@@ -14,9 +14,11 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
+import com.ernest.kotlinmessenger.ModelClasses.ModelClassUserDetails
 import com.ernest.kotlinmessenger.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
@@ -29,6 +31,7 @@ class ActivityRegister : AppCompatActivity() {
 
     var mAuth: FirebaseAuth? = null
     val firestoreDB = Firebase.firestore
+    val firebaseDatabase = Firebase.database.reference
     var storage = Firebase.storage
     var storageRef = storage.reference
     val TAG: String = "My Activity";
@@ -183,7 +186,9 @@ class ActivityRegister : AppCompatActivity() {
                     val user = mAuth!!.currentUser
                     val userID = mAuth!!.currentUser!!.uid
 
-                    uploadImageToFirebase(userDisplayPic, username, email, userID, user)
+//                    uploadImageToFirebase(userDisplayPic, username, email, userID, user)
+                    uploadProfilePic(userDisplayPic, username, email, userID, user)
+
 
                 } else {
                     Log.w("Test Error", "createUserWithEmail:failure", task.exception);
@@ -194,6 +199,39 @@ class ActivityRegister : AppCompatActivity() {
                     ).show()
                 }
             }
+    }
+
+    private fun uploadProfilePic(
+        userDisplayPic: Uri?,
+        username: String,
+        email: String,
+        userID: String,
+        user: FirebaseUser?
+    ) {
+        val storageReference = FirebaseStorage.getInstance().getReference("Profile Images/$username")
+        storageReference.putFile(userDisplayPic!!).addOnSuccessListener {
+            Log.d("Test_register", "Successfully uploaded Image: ${it.metadata?.path}")
+//            var fetchedDownloadUrl = storageReference.downloadUrl.toString()
+
+            storageReference.downloadUrl.addOnSuccessListener { uri ->
+                fetchedDownloadUrl = uri.toString()
+
+//                val newUser = hashMapOf(
+//                    "username" to username,
+//                    "email" to email,
+//                    "userID" to userID,
+//                    "dp" to fetchedDownloadUrl.toString()
+//                )
+                val newUser = ModelClassUserDetails(username, fetchedDownloadUrl.toString(), email, userID )
+//                firebaseDatabase.child("Users").child(username).setValue(newUser)
+                firebaseDatabase.child("Users").child(userID).setValue(newUser)
+            }
+            updateUI(user)
+
+        }.addOnFailureListener {
+            Log.e("Test_register", "Failure uploading image test")
+        }
+
     }
 
     private fun uploadImageToFirebase(
@@ -243,6 +281,12 @@ class ActivityRegister : AppCompatActivity() {
     }
 
     private fun updateUI(user: FirebaseUser?) {
+
+        Toast.makeText(
+            baseContext,
+            "Firebase Database Success!!!",
+            Toast.LENGTH_SHORT
+        ).show()
 
         val intent = Intent(this, ActivityConversations::class.java)
         startActivity(intent)
