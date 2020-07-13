@@ -25,7 +25,6 @@ class UsersAdapter (val context: Context, private val list: List<ModelClassUserD
     override fun getItemCount(): Int = list.size
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-
         val modelClassUserDetails: ModelClassUserDetails? = list[position]
 
         holder.bind(modelClassUserDetails)

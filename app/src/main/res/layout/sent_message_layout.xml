@@ -6,41 +6,52 @@
     android:layout_height="wrap_content">
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:orientation="horizontal"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/messageTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="30dp"
-            android:minWidth="40dp"
-            android:textColor="@color/colorWhite"
-            android:textSize="14sp"
-            android:text="@string/appbar_scrolling_view_behavior"
-            android:layout_marginEnd="50dp"
-            android:layout_marginStart="40dp"
-            android:layout_alignParentEnd="true"
-            android:paddingStart="15dp"
-            android:paddingEnd="15dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:gravity="center_vertical"
-            android:background="@drawable/sent_message_bubble_background"/>
+<!--            <de.hdodenhof.circleimageview.CircleImageView-->
+<!--                android:id="@+id/imageReceiver"-->
+<!--                android:layout_width="50dp"-->
+<!--                android:layout_height="50dp"-->
+<!--                android:src="@drawable/avatar"-->
+<!--                android:layout_marginEnd="5dp"-->
+<!--                android:layout_marginStart="5dp"/>-->
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/userDisplayPicture"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/avatar"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="5dp"/>
+            <TextView
+                android:id="@+id/messageTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="254dp"
+                android:textColor="@color/colorWhite"
+                android:textSize="16sp"
+                android:text="@string/appbar_scrolling_view_behavior"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:gravity="center_vertical"
+                android:background="@drawable/sent_message_bubble_background"/>
+
+<!--            <de.hdodenhof.circleimageview.CircleImageView-->
+<!--                android:id="@+id/imageSender"-->
+<!--                android:layout_width="50dp"-->
+<!--                android:layout_height="50dp"-->
+<!--                android:src="@drawable/avatar"-->
+<!--                android:layout_marginEnd="5dp"-->
+<!--                android:layout_marginStart="5dp"/>-->
+
+
+
+
+
 
     </RelativeLayout>
 

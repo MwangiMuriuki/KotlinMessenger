@@ -1,16 +1,23 @@
 package com.ernest.kotlinmessenger.Activities
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
+import com.ernest.kotlinmessenger.Adapters.ConvViewHolder
+import com.ernest.kotlinmessenger.Adapters.ConversationsAdapter
+import com.ernest.kotlinmessenger.ModelClasses.ConvData
 import com.ernest.kotlinmessenger.ModelClasses.ModelClassUserDetails
+import com.ernest.kotlinmessenger.ModelClasses.UserItems
 import com.ernest.kotlinmessenger.R
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -21,6 +28,9 @@ class ActivityConversations : AppCompatActivity() {
     var firebaseAuth: FirebaseAuth? = null
     val firebaseFirestore = Firebase.firestore
     val userReference = Firebase.database.reference
+    var mRootRef = FirebaseDatabase.getInstance().getReference()
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,28 +45,79 @@ class ActivityConversations : AppCompatActivity() {
 
         firebaseAuth = FirebaseAuth.getInstance()
         val currentUser = firebaseAuth!!.currentUser
+        val userID: String? = currentUser?.uid
 
-        if (currentUser!=null){
-            val userID: String = currentUser.uid
-//            firebaseFirestore.collection("Users").document(userID).get().addOnCompleteListener {
-//                if (it.isSuccessful){
-//                    val documentSnapshot: DocumentSnapshot? = it.result
-//                    name.text = documentSnapshot!!.getString("username")
-//                }
-//            }
+        var mConvDatabase = FirebaseDatabase.getInstance().getReference().child("Chat").child(userID!!)
+        mConvDatabase.keepSynced(true);
+        var mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users")
+        var mMessageDatabase = FirebaseDatabase.getInstance().getReference().child("Messages").child(userID)
+        mUsersDatabase.keepSynced(true)
 
-           val dbRef = userReference.child("Users").child(userID)
+        var list = mutableListOf<ConvData>()
+        val adapter = ConversationsAdapter(applicationContext, list)
+        conversationRecyclerView.adapter = adapter
 
-            val fetchUserListener = object : ValueEventListener{
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val userData = snapshot.getValue(ModelClassUserDetails::class.java)
-                    name.text = userData?.username
-                }
-                override fun onCancelled(error: DatabaseError) {
-                }
+        getData(list, adapter, currentUser)
+    }
+
+    private fun getData(
+        list: MutableList<ConvData>,
+        adapter: ConversationsAdapter,
+        currentUser: FirebaseUser?
+    ) {
+        mRootRef.child("Messages").child(currentUser?.uid!!)
+            .addChildEventListener(object: ChildEventListener{
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val conversations = snapshot.getValue(ConvData::class.java)
+                var taskObject = snapshot.key
+                val task = ConvData()
+
+                getUserDetails(taskObject, task)
+
             }
-            dbRef.addValueEventListener(fetchUserListener)
-        }
+
+                private fun getUserDetails(taskObject: String?, task: ConvData) {
+                    mRootRef.child("Users").child(taskObject!!).addValueEventListener(object: ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val userData = snapshot.getValue(ModelClassUserDetails::class.java)
+                        val user = userData?.username
+                        val userDP = userData?.dp
+
+                        with(task){
+                            chatUserID = taskObject
+                            chatUserName = user!!
+                            chatUserPic = userDP!!
+                        }
+
+                        val keys = snapshot.key
+                        Log.d("Keys", keys!!)
+                        list.add(task)
+
+                        adapter.notifyDataSetChanged()
+
+                    }
+                    override fun onCancelled(error: DatabaseError) {
+                    }
+                })
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                TODO("Not yet implemented")
+            }
+
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -81,3 +142,4 @@ class ActivityConversations : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 }
+

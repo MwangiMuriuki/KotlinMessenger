@@ -1,16 +1,17 @@
 package com.ernest.kotlinmessenger.Activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.ernest.kotlinmessenger.Adapters.AdapterMessages
 import com.ernest.kotlinmessenger.ModelClasses.MessageData
+import com.ernest.kotlinmessenger.ModelClasses.ModelClassUserDetails
 import com.ernest.kotlinmessenger.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.local.LruGarbageCollector.Results
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_messages.*
 import java.util.*
@@ -22,6 +23,8 @@ class ActivityMessages : AppCompatActivity() {
     var databaseReference = FirebaseDatabase.getInstance()
     var mRootRef = FirebaseDatabase.getInstance().getReference()
     var currentUserID: String? = null
+    var myUserName: String? = null
+    var myProfilePic: String? = null
     var fetchedMessageList: MessageData? = null
 
 
@@ -34,17 +37,30 @@ class ActivityMessages : AppCompatActivity() {
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.arrow_back)
+
         mAuth = FirebaseAuth.getInstance()
         currentUserID = mAuth!!.currentUser!!.uid
 
         var dbReference = databaseReference.getReference("Chats")
 
         val bundle: Bundle? = intent.extras
-        val userName: String? = intent.getStringExtra("username")
+        val recipientUserName: String? = intent.getStringExtra("username")
         var userProfPic: String? = intent.getStringExtra("profilePic")
         var otherUserID: String? = intent.getStringExtra("otherUserID")
 
-        supportActionBar?.title = userName
+        supportActionBar?.title = recipientUserName
+
+        mRootRef.child("Users").child(currentUserID!!).addValueEventListener(object: ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val userData = snapshot.getValue(ModelClassUserDetails::class.java)
+                myUserName = userData?.username
+                myProfilePic = userData?.dp
+            }
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+
+        })
 
         val sentMessageslist = mutableListOf<MessageData>()
         val adapter = AdapterMessages(applicationContext, sentMessageslist)
@@ -80,7 +96,7 @@ class ActivityMessages : AppCompatActivity() {
             if (enteredMessage!!.isEmpty()){
                 Toast.makeText(baseContext, "Please Enter Message", Toast.LENGTH_SHORT).show()
             }else{
-                sendMessageMthd(enteredMessage, currentUserID!!, otherUserID, dbReference)
+                sendMessageMthd(enteredMessage, currentUserID!!, otherUserID, dbReference, userProfPic, myProfilePic, myUserName)
             }
         }
     }
@@ -97,7 +113,6 @@ class ActivityMessages : AppCompatActivity() {
                     val messages: MessageData? = snapshot.getValue(MessageData::class.java)
                     sentMessageslist.add(messages!!)
                     adapter.notifyDataSetChanged()
-
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -122,7 +137,10 @@ class ActivityMessages : AppCompatActivity() {
         enteredMessage: String,
         currentUserID: String,
         otherUserID: String?,
-        dbReference: DatabaseReference
+        dbReference: DatabaseReference,
+        userProfPic: String?,
+        myProfilePic: String?,
+        myUserName: String?
     ) {
         val chatUserRef: String = "Messages/$otherUserID/$currentUserID"
         val currentUserRef: String = "Messages/$currentUserID/$otherUserID"
@@ -131,11 +149,14 @@ class ActivityMessages : AppCompatActivity() {
         val keyPushId = messageKey.key
 
         val messagesMap:HashMap<String,Any> = HashMap<String,Any>()
+        messagesMap["chatUserId"] = chatUserRef
         messagesMap["message"] = enteredMessage
         messagesMap["seen"] = false
         messagesMap["type"] = "text"
         messagesMap["timestamp"] = ServerValue.TIMESTAMP
         messagesMap["sender"] = currentUserID
+        messagesMap["senderName"] = myUserName!!
+        messagesMap["senderPic"] = myProfilePic!!
 
         val messagesChatMap:HashMap<String,Any> = HashMap<String,Any>()
         messagesChatMap["$currentUserRef/$keyPushId"] = messagesMap
@@ -153,7 +174,12 @@ class ActivityMessages : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
+//        onBackPressed()
+        val intent = Intent(applicationContext, ActivityConversations::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+        startActivity(intent)
+        finish()
+
         return true
     }
 }
